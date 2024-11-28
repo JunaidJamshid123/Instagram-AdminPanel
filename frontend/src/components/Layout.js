@@ -1,11 +1,11 @@
-import React from 'react';
-import Sidebar from './sidebar';
+import React from "react";
+import Sidebar from "./sidebar";
 
-function Layout({ children }) {
+function Layout({ children, setActivePage }) {
   return (
     <div className="flex">
       {/* Sidebar */}
-      <Sidebar />
+      <Sidebar setActivePage={setActivePage} />
 
       {/* Main Content */}
       <div className="ml-60 flex-1 flex flex-col">
