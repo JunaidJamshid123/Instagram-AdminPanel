@@ -5,6 +5,7 @@ import Charts from "./Dasboard/Charts";
 import UserStats from "../components/Dasboard/userstats";
 import AddUserForm from "../components/UserManagment/add_user_form"; // Import AddUserForm
 import UserList from "../components/UserManagment/userlist"; // Correctly capitalize "UserList"
+import PostList from "./PostManagment/PostList";
 
 export default function DashboardPage() {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -31,13 +32,13 @@ export default function DashboardPage() {
       case "userList":
         return (
           <div>
-            
-            
             <UserList /> {/* Display User List */}
           </div>
         );
       case "post":
-        return <div>Post Management Page</div>;
+        return <div>
+        <PostList/>
+        </div>;
       case "analytics":
         return <div>Analytics Page</div>;
       case "announcements":
