@@ -6,6 +6,7 @@ import UserStats from "../components/Dasboard/userstats";
 import AddUserForm from "../components/UserManagment/add_user_form"; // Import AddUserForm
 import UserList from "../components/UserManagment/userlist"; // Correctly capitalize "UserList"
 import PostList from "./PostManagment/PostList";
+import Announcements from "./Announcements/AnnouncementList";
 
 export default function DashboardPage() {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -42,7 +43,9 @@ export default function DashboardPage() {
       case "analytics":
         return <div>Analytics Page</div>;
       case "announcements":
-        return <div>Announcements Page</div>;
+        return <div>
+        <Announcements/>
+        </div>;
       case "userSegments":
         return <div>User Segments Page</div>;
       default:
