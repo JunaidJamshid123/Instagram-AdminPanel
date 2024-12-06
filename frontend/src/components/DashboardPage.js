@@ -6,6 +6,7 @@ import UserStats from "../components/Dasboard/userstats";
 import AddUserForm from "../components/UserManagment/add_user_form"; // Import AddUserForm
 import UserList from "../components/UserManagment/userlist"; // Correctly capitalize "UserList"
 import PostList from "./PostManagment/PostList";
+import UserSegment from "../components/UserSegmentations/UserSegment";
 import Announcements from "./Announcements/AnnouncementList";
 
 export default function DashboardPage() {
@@ -51,7 +52,9 @@ export default function DashboardPage() {
         <Announcements/>
         </div>;
       case "userSegments":
-        return <div>User Segments Page</div>;
+        return <div>
+        <UserSegment />
+        </div>;
       default:
         return <div>Page Not Found</div>;
     }
