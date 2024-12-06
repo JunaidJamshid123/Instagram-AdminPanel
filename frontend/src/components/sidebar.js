@@ -2,13 +2,13 @@ import React from "react";
 
 function Sidebar({ setActivePage }) {
   return (
-    <div className="h-screen w-60 bg-blue-900 text-white flex flex-col justify-between fixed">
+    <div className="h-screen w-60 bg-white text-black flex flex-col justify-between fixed border-r border-gray-300">
       {/* Profile Section */}
       <div className="flex flex-col items-center py-6">
-        <div className="bg-gray-300 w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold text-blue-900">
+        <div className="bg-gray-200 w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold text-purple-600">
           AB
         </div>
-        <h2 className="mt-2 text-lg font-semibold">Andrew Bennet</h2>
+        <h2 className="mt-2 text-lg font-semibold text-gray-700">Andrew Bennet</h2>
       </div>
 
       {/* Navigation Links */}
@@ -24,18 +24,18 @@ function Sidebar({ setActivePage }) {
           ].map((item, index) => (
             <li
               key={index}
-              className="flex items-center space-x-2 hover:bg-blue-700 p-2 rounded-md cursor-pointer"
+              className="flex items-center space-x-3 hover:bg-gray-100 p-3 rounded-md cursor-pointer transition-colors duration-200 text-gray-700"
               onClick={() => setActivePage(item.value)} // Update active page on click
             >
-              <span className="material-icons-outlined">{item.icon}</span>
-              <span>{item.label}</span>
+              <span className="material-icons-outlined text-gray-600">{item.icon}</span>
+              <span className="font-medium">{item.label}</span>
             </li>
           ))}
         </ul>
       </nav>
 
       {/* Footer */}
-      <div className="text-center py-4 text-sm border-t border-gray-700">
+      <div className="text-center py-4 text-sm border-t border-gray-200 text-gray-500">
         © 2024 Dashboard
       </div>
     </div>
