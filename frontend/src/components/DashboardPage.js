@@ -41,7 +41,11 @@ export default function DashboardPage() {
         <PostList/>
         </div>;
       case "analytics":
-        return <div>Analytics Page</div>;
+        return <div>
+        <UserStats />
+
+            <Charts />
+        </div>;
       case "announcements":
         return <div>
         <Announcements/>

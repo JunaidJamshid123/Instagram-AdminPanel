@@ -39,14 +39,16 @@ export default function InteractiveCharts() {
     ],
   };
 
-  const announcementsEngagementData = {
-    labels: ["Clicked", "Opened", "Ignored"],
+  const announcementsOverTimeData = {
+    labels: ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"],
     datasets: [
       {
-        label: "Engagement",
-        data: [300, 600, 200],
-        backgroundColor: ["#2196F3", "#4CAF50", "#F44336"],
-        hoverOffset: 6,
+        label: "Announcements Sent",
+        data: [50, 70, 60, 90, 110],
+        borderColor: "#2196F3",
+        backgroundColor: "rgba(33, 150, 243, 0.2)",
+        tension: 0.3,
+        pointRadius: 4,
       },
     ],
   };
@@ -96,9 +98,9 @@ export default function InteractiveCharts() {
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md" style={{ height: "300px" }}>
-            <h3 className="text-lg font-semibold mb-4">Announcements Engagement</h3>
+            <h3 className="text-lg font-semibold mb-4">Announcements Sent Over Time</h3>
             <div style={{ height: "220px" }}>
-              <Pie data={announcementsEngagementData} options={chartOptions} />
+              <Line data={announcementsOverTimeData} options={chartOptions} />
             </div>
           </div>
 
