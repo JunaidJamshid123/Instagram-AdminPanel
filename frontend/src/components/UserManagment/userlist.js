@@ -46,17 +46,17 @@ export default function UserList() {
   };
 
   return (
-    <div className="p-8 bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="p-6 border-b border-gray-200">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">User Management</h1>
-          <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-semibold text-gray-800 mb-4">User Management</h1>
+          <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
             <input
               placeholder="Search users..."
               className="pl-4 pr-4 py-2 rounded-full border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition duration-200 w-full max-w-md"
             />
             <button
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition w-full sm:w-auto"
               onClick={handleAddNewUser}
             >
               Add New User
@@ -67,7 +67,7 @@ export default function UserList() {
         {/* Modal for Add or Edit User */}
         {showModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white w-96 rounded-lg shadow-lg p-6 relative">
+            <div className="bg-white w-full max-w-md rounded-lg shadow-lg p-6 relative">
               <button
                 className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
                 onClick={() => setShowModal(false)}
@@ -85,7 +85,7 @@ export default function UserList() {
 
         {/* User List Table */}
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="min-w-full">
             <thead>
               <tr className="bg-gray-50">
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">

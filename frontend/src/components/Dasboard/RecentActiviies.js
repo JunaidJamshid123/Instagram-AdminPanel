@@ -12,25 +12,29 @@ export default function RecentActivity() {
     { id: 6, icon: <FaUser className="text-blue-500" />, description: "User deleted account", timestamp: "23-11-2024 01:00 PM" },
   ];
 
-  // Show only first 5 activities, rest will be hidden
+  // Show only the first 5 activities
   const visibleActivities = activities.slice(0, 5);
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Recent Activity</h2>
-        <a href="#" className="text-blue-600 hover:underline">
+    <div className="p-6 bg-white rounded-lg shadow-md space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-bold text-gray-800">Recent Activity</h2>
+        <a href="#" className="text-blue-600 text-sm hover:underline">
           View All
         </a>
       </div>
-      <ul className="space-y-4">
+      {/* Activity List */}
+      <ul className="divide-y divide-gray-200">
         {visibleActivities.map((activity) => (
-          <li key={activity.id} className="flex items-center space-x-4">
+          <li key={activity.id} className="py-4 flex items-start space-x-4">
             {/* Icon */}
-            <div className="p-3 bg-gray-100 rounded-full">{activity.icon}</div>
-            {/* Description */}
-            <div>
-              <p className="text-gray-800 font-medium">{activity.description}</p>
+            <div className="p-3 bg-gray-100 rounded-full flex items-center justify-center">
+              {activity.icon}
+            </div>
+            {/* Description and Timestamp */}
+            <div className="flex flex-col justify-start">
+              <p className="text-gray-800 font-semibold">{activity.description}</p>
               <p className="text-gray-500 text-sm">{activity.timestamp}</p>
             </div>
           </li>

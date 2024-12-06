@@ -11,16 +11,18 @@ const stats = [
 
 export default function UserStats() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-      {stats.map((stat, i) => (
-        <div key={i} className="p-4 bg-white shadow rounded-lg flex items-center">
-          <div className="p-3 bg-gray-100 rounded-full">{stat.icon}</div>
-          <div className="ml-4">
-            <h2 className="text-xl font-bold">{stat.number}</h2>
-            <p className="text-gray-500">{stat.title}</p>
+    <div className="mb-6"> {/* Added margin-bottom here */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        {stats.map((stat, i) => (
+          <div key={i} className="p-4 bg-white shadow rounded-lg flex items-center">
+            <div className="p-3 bg-gray-100 rounded-full">{stat.icon}</div>
+            <div className="ml-4">
+              <h2 className="text-xl font-bold">{stat.number}</h2>
+              <p className="text-gray-500">{stat.title}</p>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }

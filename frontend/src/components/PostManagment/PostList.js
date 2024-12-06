@@ -45,16 +45,16 @@ export default function PostList() {
 
   return (
     <div className="p-8 bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen">
-      <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+      <div className="max-w-full md:max-w-6xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="p-6 border-b border-gray-200">
           <h1 className="text-2xl font-bold text-gray-800 mb-4">Post Management</h1>
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4 sm:gap-0">
             <input
               placeholder="Search posts..."
-              className="pl-4 pr-4 py-2 rounded-full border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition duration-200 w-full max-w-md"
+              className="pl-4 pr-4 py-2 rounded-full border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition duration-200 w-full sm:w-72"
             />
             <button
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition w-full sm:w-auto"
               onClick={handleAddNewPost}
             >
               Add New Post
@@ -65,7 +65,7 @@ export default function PostList() {
         {/* Modal for Add or Edit Post */}
         {showModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white w-96 rounded-lg shadow-lg p-6 relative">
+            <div className="bg-white w-full sm:w-96 rounded-lg shadow-lg p-6 relative">
               <button
                 className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
                 onClick={() => setShowModal(false)}
@@ -85,7 +85,7 @@ export default function PostList() {
 
         {/* Post List Table */}
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full table-auto">
             <thead>
               <tr className="bg-gray-50">
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
@@ -108,10 +108,10 @@ export default function PostList() {
             <tbody className="bg-white divide-y divide-gray-200">
               {posts.map((post) => (
                 <tr key={post.postId} className="hover:bg-gray-50 transition">
-                  <td className="px-6 py-4">{post.postId}</td>
-                  <td className="px-6 py-4">{post.title}</td>
-                  <td className="px-6 py-4">{post.author}</td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 text-sm text-gray-900">{post.postId}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{post.title}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{post.author}</td>
+                  <td className="px-6 py-4 text-sm">
                     <span
                       className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         post.status === "Published"
@@ -122,7 +122,7 @@ export default function PostList() {
                       {post.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-right flex gap-2 justify-end">
+                  <td className="px-6 py-4 text-right text-sm flex gap-2 justify-end">
                     <button
                       className="text-blue-600 hover:underline flex items-center"
                       onClick={() => handleEdit(post)}
