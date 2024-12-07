@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -7,7 +7,7 @@ const Login = () => {
     password: "",
   });
   const [error, setError] = useState(null);
-
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,11 +31,17 @@ const Login = () => {
       // Handle login success
       if (response.ok) {
         console.log("Login Successful:", data);
+        //navigate("/admin-dashboard");
         // Save token to localStorage for future authentication
         localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
 
-        // Redirect to the dashboard or home page
-       // history.push("/dashboard"); // Modify based on your app's flow
+
+        // Redirect based on user role
+        if (data.user.isAdmin) {
+          navigate("/admin-dashboard");
+        }
+        
       } else {
         // Handle errors
         setError(data.message || "Login failed, please try again");
@@ -81,7 +87,10 @@ const Login = () => {
           </button>
         </form>
         <p style={styles.footerText}>
-          Don't have an account? <a href="/signup" style={styles.link}>Sign Up</a>
+          Don't have an account?{" "}
+          <a href="/signup" style={styles.link}>
+            Sign Up
+          </a>
         </p>
       </div>
     </div>
@@ -140,9 +149,6 @@ const styles = {
     fontWeight: "bold",
     cursor: "pointer",
     transition: "background-color 0.3s ease",
-  },
-  buttonHover: {
-    backgroundColor: "#2980b9",
   },
   footerText: {
     fontSize: "14px",

@@ -1,6 +1,16 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 function Sidebar({ setActivePage }) {
+  const navigate = useNavigate();
+
+  // Logout functionality
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Remove token from localStorage
+    localStorage.removeItem("user"); // Remove user data from localStorage
+    navigate("/"); // Redirect to the login page
+  };
+
   return (
     <div className="h-screen w-60 bg-white text-black flex flex-col justify-between fixed border-r border-gray-300">
       {/* Profile Section */}
@@ -34,9 +44,18 @@ function Sidebar({ setActivePage }) {
         </ul>
       </nav>
 
-      {/* Footer */}
-      <div className="text-center py-4 text-sm border-t border-gray-200 text-gray-500">
-        © 2024 Dashboard
+      {/* Footer with Logout */}
+      <div className="px-6 py-4 border-t border-gray-200">
+        <button
+          className="flex items-center space-x-3 w-full p-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors duration-200 cursor-pointer"
+          onClick={handleLogout}
+        >
+          <span className="material-icons-outlined text-gray-600">logout</span>
+          <span className="font-medium">Logout</span>
+        </button>
+        <div className="text-center text-sm text-gray-500 mt-4">
+          © 2024 Dashboard
+        </div>
       </div>
     </div>
   );
