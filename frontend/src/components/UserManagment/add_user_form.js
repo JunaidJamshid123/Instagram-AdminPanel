@@ -1,11 +1,11 @@
 import { useState } from "react";
 
-export default function UserForm({ editMode, selectedUser, onClose }) {
+export default function UserForm({ onSubmitSuccess }) {
   const [formData, setFormData] = useState({
-    username: selectedUser?.username || "",
-    email: selectedUser?.email || "",
+    username: "",
+    email: "",
     password: "",
-    role: selectedUser?.role || "",
+    role: "user",
   });
 
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -15,88 +15,104 @@ export default function UserForm({ editMode, selectedUser, onClose }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!editMode && formData.password !== confirmPassword) {
+
+    if (formData.password !== confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
-    console.log("Form submitted", formData);
-    onClose(); // Close modal
+
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        alert(result.message);
+        onSubmitSuccess?.(); // Optional callback for parent components
+      } else {
+        alert(result.message || "Something went wrong");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Server error occurred.");
+    }
   };
 
   return (
     <div>
-      <h2 className="text-xl font-bold mb-4">
-        {editMode ? "Edit User Information" : "Sign Up"}
-      </h2>
+      <h2 className="text-xl font-bold mb-4">Create New User</h2>
       <form className="space-y-4" onSubmit={handleSubmit}>
         {/* Username Field */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">Username</label>
+          <label className="block text-sm font-medium">Username</label>
           <input
             type="text"
             name="username"
             placeholder="Enter username"
             value={formData.username}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border px-4 py-2"
             required
           />
         </div>
 
         {/* Email Field */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">Email</label>
+          <label className="block text-sm font-medium">Email</label>
           <input
             type="email"
             name="email"
             placeholder="Enter email address"
             value={formData.email}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border px-4 py-2"
             required
           />
         </div>
 
         {/* Password Field */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">Password</label>
+          <label className="block text-sm font-medium">Password</label>
           <input
             type="password"
             name="password"
             placeholder="Enter password"
             value={formData.password}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border px-4 py-2"
             required
           />
         </div>
 
         {/* Confirm Password Field */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
+          <label className="block text-sm font-medium">Confirm Password</label>
           <input
             type="password"
             placeholder="Confirm password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border px-4 py-2"
             required
           />
         </div>
 
-        {/* Role Field */}
+        {/* Role Selection */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">Role</label>
+          <label className="block text-sm font-medium">Role</label>
           <select
             name="role"
             value={formData.role}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
+            className="w-full border px-4 py-2"
           >
-            <option value="">Select Role</option>
             <option value="user">User</option>
             <option value="admin">Admin</option>
           </select>
@@ -105,9 +121,9 @@ export default function UserForm({ editMode, selectedUser, onClose }) {
         {/* Submit Button */}
         <button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition w-full"
+          className="bg-blue-500 text-white px-4 py-2 rounded-md w-full"
         >
-          {editMode ? "Update User Information" : "Sign Up"}
+          Create New User
         </button>
       </form>
     </div>

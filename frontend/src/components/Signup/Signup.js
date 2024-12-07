@@ -33,15 +33,20 @@ const Signup = () => {
       username: formData.username,
       email: formData.email,
       password: formData.password,
+      role: "user", // Role is hardcoded to "user"
     };
 
     try {
       // Send a POST request to the backend with JSON data
-      const response = await axios.post("http://localhost:5000/api/auth/signup", dataToSend, {
-        headers: {
-          "Content-Type": "application/json", // Use JSON content type
-        },
-      });
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/signup",
+        dataToSend,
+        {
+          headers: {
+            "Content-Type": "application/json", // Use JSON content type
+          },
+        }
+      );
 
       if (response.data.success) {
         alert("Signup successful!");

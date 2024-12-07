@@ -11,60 +11,64 @@ const validateEmail = (email) => {
 // Signup Controller
 const signup = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
-   
-    // Check if all fields are provided
-    if (!username || !email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
+    const { username, email, password, role } = req.body;
+
+    // Validate required fields
+    if (!username || !email || !password || !role) {
+      return res.status(400).json({ message: "All fields are required." });
     }
 
-    // Check if the email is in a valid format
+    // Validate email format
     if (!validateEmail(email)) {
-      return res.status(400).json({ message: "Invalid email format" });
+      return res.status(400).json({ message: "Invalid email format." });
     }
 
-    // Check if the email or username already exists
+    // Check if user already exists
     const existingUser = await User.findOne({
       $or: [{ email }, { username }],
     });
 
     if (existingUser) {
-      return res.status(400).json({ message: "Username or email already exists" });
+      return res
+        .status(400)
+        .json({ message: "Username or email already exists." });
     }
 
     // Hash the password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create a new user instance without the profile picture
+    // Determine isAdmin based on role
+    const isAdmin = role === "admin";
+
+    // Create new user
     const newUser = new User({
       username,
       email,
       password: hashedPassword,
+      isAdmin,
     });
 
-    // Save the new user to the database
     const savedUser = await newUser.save();
 
-    // Generate JWT Token
+    // Generate JWT
     const token = jwt.sign(
-      { userId: savedUser._id, username: savedUser.username, isAdmin: savedUser.isAdmin },
+      { userId: savedUser._id, username: savedUser.username, isAdmin },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" } // Token expires in 1 hour
+      { expiresIn: "1h" }
     );
 
-    // Send the response back to the client with the user data and token
     res.status(201).json({
       message: "User registered successfully",
       user: {
         id: savedUser._id,
         username: savedUser.username,
         email: savedUser.email,
+        isAdmin,
       },
-      token, // Send the JWT token to the client
+      token,
     });
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
