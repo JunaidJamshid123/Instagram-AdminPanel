@@ -1,30 +1,56 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
-    confirmPassword: "",
-    profilePicture: null,
   });
+
+  const [confirmPassword, setConfirmPassword] = useState(""); // Separate state for confirmPassword
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    if (name === "confirmPassword") {
+      setConfirmPassword(value); // Update confirmPassword separately
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
-  const handleFileChange = (e) => {
-    setFormData({ ...formData, profilePicture: e.target.files[0] });
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
+
+    // Check if password and confirm password match
+    if (formData.password !== confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
-    console.log("Form Submitted:", formData);
+
+    // Prepare data for submission
+    const dataToSend = {
+      username: formData.username,
+      email: formData.email,
+      password: formData.password,
+    };
+
+    try {
+      // Send a POST request to the backend with JSON data
+      const response = await axios.post("http://localhost:5000/api/auth/signup", dataToSend, {
+        headers: {
+          "Content-Type": "application/json", // Use JSON content type
+        },
+      });
+
+      if (response.data.success) {
+        alert("Signup successful!");
+        // Redirect or clear the form as needed
+      }
+    } catch (error) {
+      console.error("Error during signup:", error);
+      alert("An error occurred. Please try again.");
+    }
   };
 
   return (
@@ -74,24 +100,12 @@ const Signup = () => {
               type="password"
               id="confirmPassword"
               name="confirmPassword"
-              value={formData.confirmPassword}
+              value={confirmPassword}
               onChange={handleChange}
               required
               placeholder="Confirm Password"
               style={styles.input}
             />
-          </div>
-          <div style={styles.inputGroup}>
-            <input
-              type="file"
-              id="profilePicture"
-              name="profilePicture"
-              onChange={handleFileChange}
-              style={styles.fileInput}
-            />
-            <label htmlFor="profilePicture" style={styles.fileLabel}>
-              Upload Profile Picture (Optional)
-            </label>
           </div>
           <button type="submit" style={styles.button}>
             Sign Up
@@ -150,19 +164,6 @@ const styles = {
     fontSize: "14px",
     fontFamily: "'Roboto', sans-serif",
   },
-  fileInput: {
-    display: "none",
-  },
-  fileLabel: {
-    display: "inline-block",
-    padding: "10px 15px",
-    backgroundColor: "#007BFF",
-    color: "#fff",
-    borderRadius: "6px",
-    fontSize: "14px",
-    cursor: "pointer",
-    marginTop: "5px",
-  },
   button: {
     padding: "12px",
     backgroundColor: "#007BFF",
@@ -173,9 +174,6 @@ const styles = {
     fontWeight: "bold",
     cursor: "pointer",
     transition: "background-color 0.3s ease",
-  },
-  buttonHover: {
-    backgroundColor: "#0056b3",
   },
 };
 

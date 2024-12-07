@@ -1,15 +1,26 @@
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const User = require("../models/User"); // Import the User model
-const jwt = require("jsonwebtoken"); // For generating JWT tokens
+
+// Email validation function
+const validateEmail = (email) => {
+  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+  return emailRegex.test(email);
+};
 
 // Signup Controller
 const signup = async (req, res) => {
   try {
-    const { username, email, password, profilePicture } = req.body;
-
+    const { username, email, password } = req.body;
+   
     // Check if all fields are provided
     if (!username || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
+    }
+
+    // Check if the email is in a valid format
+    if (!validateEmail(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
     }
 
     // Check if the email or username already exists
@@ -25,12 +36,11 @@ const signup = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create a new user instance
+    // Create a new user instance without the profile picture
     const newUser = new User({
       username,
       email,
       password: hashedPassword,
-      profilePicture,
     });
 
     // Save the new user to the database
@@ -50,7 +60,6 @@ const signup = async (req, res) => {
         id: savedUser._id,
         username: savedUser.username,
         email: savedUser.email,
-        profilePicture: savedUser.profilePicture,
       },
       token, // Send the JWT token to the client
     });
@@ -91,7 +100,6 @@ const login = async (req, res) => {
         id: user._id,
         username: user.username,
         email: user.email,
-        profilePicture: user.profilePicture,
       },
       token, // Send the JWT token to the client
     });

@@ -1,25 +1,56 @@
 import React, { useState } from "react";
 
+
 const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const [error, setError] = useState(null);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login Submitted:", formData);
+    try {
+      // Send a POST request to the backend for login
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      // Handle login success
+      if (response.ok) {
+        console.log("Login Successful:", data);
+        // Save token to localStorage for future authentication
+        localStorage.setItem("token", data.token);
+
+        // Redirect to the dashboard or home page
+       // history.push("/dashboard"); // Modify based on your app's flow
+      } else {
+        // Handle errors
+        setError(data.message || "Login failed, please try again");
+      }
+    } catch (error) {
+      setError("Server error, please try again later");
+      console.error("Error during login:", error);
+    }
   };
 
   return (
     <div style={styles.page}>
       <div style={styles.container}>
         <h2 style={styles.title}>Log In</h2>
+        {error && <p style={styles.errorText}>{error}</p>}
         <form onSubmit={handleSubmit} style={styles.form}>
           <div style={styles.inputGroup}>
             <input
@@ -122,6 +153,11 @@ const styles = {
     color: "#3498db",
     textDecoration: "none",
     fontWeight: "500",
+  },
+  errorText: {
+    color: "red",
+    fontSize: "14px",
+    marginBottom: "10px",
   },
 };
 

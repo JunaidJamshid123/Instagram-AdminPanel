@@ -1,13 +1,23 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-const authRoutes = require("./routes/authRoutes"); // Import auth routes
+const cors = require("cors");
+const authRoutes = require("./routes/authRoutes");
 
 dotenv.config();
 const app = express();
 
 // Middleware to parse incoming JSON data
 app.use(express.json());
+
+// Enable CORS for all routes
+app.use(cors());
+
+// Alternatively, to allow only specific origins:
+const corsOptions = {
+  origin: 'http://localhost:3000', // Only allow the React frontend
+};
+app.use(cors(corsOptions));
 
 // Connect to the database
 mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
