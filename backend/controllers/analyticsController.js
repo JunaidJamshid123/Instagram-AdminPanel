@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Post = require("../models/Post");
 const Announcement = require("../models/Announcement");
+const UserSegment = require("../models/UserSegment");  // Import UserSegment model
 
 exports.getAnalytics = async (req, res) => {
   try {
@@ -13,6 +14,9 @@ exports.getAnalytics = async (req, res) => {
     // Fetch total announcements
     const totalAnnouncements = await Announcement.countDocuments();
 
+    // Fetch total user segments
+    const totalUserSegments = await UserSegment.countDocuments();  // Count user segments
+
     // Fetch total user segments (Admin and Regular Users)
     const totalAdmins = await User.countDocuments({ isAdmin: true });
     const totalRegularUsers = totalUsers - totalAdmins;
@@ -23,17 +27,18 @@ exports.getAnalytics = async (req, res) => {
     const totalComments = allPosts.reduce((acc, post) => acc + post.comments.length, 0);
 
     // Calculate engagement percentages
-     likePercentage = totalLikes / (totalPosts || 1) * 100; // Avoid division by zero
-     commentPercentage = totalComments / (totalPosts || 1) * 100;
-     const engagementRate = (likePercentage + commentPercentage)/2;
+    const likePercentage = totalLikes / (totalPosts || 1) * 100; // Avoid division by zero
+    const commentPercentage = totalComments / (totalPosts || 1) * 100;
+    const engagementRate = (likePercentage + commentPercentage) / 2;
 
-    // Response
+    // Response with total user segments
     res.status(200).json({
       totalUsers,
       totalAdmins,
       totalRegularUsers,
       totalPosts,
       totalAnnouncements,
+      totalUserSegments,  // Include the total number of user segments
       userEngagement: {
         totalLikes,
         totalComments,
