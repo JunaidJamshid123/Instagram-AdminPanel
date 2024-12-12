@@ -12,12 +12,20 @@ import Announcements from "./Announcements/AnnouncementList";
 export default function DashboardPage() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activePage, setActivePage] = useState("dashboard"); // State for the active page
+   const [adminName, setAdminName] = useState(""); // State for admin name
 
-  useEffect(() => {
+ useEffect(() => {
+    // Fetch admin name from localStorage
+    const adminFromSession = localStorage.getItem("user"); // Assuming "user" contains admin info
+    if (adminFromSession) {
+      const parsedAdmin = JSON.parse(adminFromSession);
+      setAdminName(parsedAdmin.username || "Admin"); // Fallback to "Admin" if username is missing
+    }
+
+    // Update time every second
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
-
   const renderPageContent = () => {
     switch (activePage) {
       case "dashboard":
@@ -60,12 +68,12 @@ export default function DashboardPage() {
     }
   };
 
-  return (
+    return (
     <Layout setActivePage={setActivePage}>
       {/* Header Section */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold">Welcome, Admin Junaid!</h1>
+          <h1 className="text-3xl font-bold">Welcome, {adminName}!</h1>
           <p className="text-gray-600">Here's an overview of your dashboard.</p>
         </div>
         <div className="text-right">

@@ -14,7 +14,7 @@ export default function UserStats() {
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/analytics");
+        const response = await fetch("http://localhost:5000/api/analytics/analytics");
         const data = await response.json();
         setAnalyticsData({
           totalUsers: data.totalUsers,

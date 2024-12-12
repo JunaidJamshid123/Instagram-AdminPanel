@@ -1,27 +1,60 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
+import EditAnnouncementForm from "./EditAnnouncement";
 import AddAnnouncementForm from "./AddAnnouncement";
 
 export default function AnnouncementList() {
-  const [announcements, setAnnouncements] = useState([
-    {
-      id: "A001",
-      title: "New Office Opening",
-      content: "We are excited to announce the opening of our new office in New York!",
-      author: "Admin",
-      status: "Active",
-    },
-    {
-      id: "A002",
-      title: "Maintenance Notice",
-      content: "System maintenance is scheduled for this Sunday from 2:00 AM to 5:00 AM.",
-      author: "IT Team",
-      status: "Scheduled",
-    },
-  ]);
-
+  const [announcements, setAnnouncements] = useState([]);
+  const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
+
+  // Fetch logged-in admin ID from localStorage or fallback
+  const [loggedInAdminId, setLoggedInAdminId] = useState(null);
+  useEffect(() => {
+    const adminFromSession = localStorage.getItem("user"); // Assuming "user" contains admin info
+    if (adminFromSession) {
+      const parsedAdmin = JSON.parse(adminFromSession);
+      setLoggedInAdminId(parsedAdmin.id || "fallbackAdminId"); // Replace fallback with proper logic
+    }
+  }, []);
+
+  // Fetch announcements from the backend API
+  useEffect(() => {
+    const fetchAnnouncements = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/announcements");
+        const data = await response.json();
+        setAnnouncements(data);
+      } catch (error) {
+        console.error("Error fetching announcements:", error);
+      }
+    };
+
+    fetchAnnouncements();
+  }, []);
+
+  // Fetch users data to map createdBy to username
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/users");
+        const data = await response.json();
+        setUsers(data);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  // Get the username by userId
+  const getUsernameById = (userId) => {
+    const user = users.find((user) => user._id === userId);
+    return user ? user.username : "Unknown User";
+  };
 
   const handleEdit = (announcement) => {
     setEditMode(true);
@@ -35,8 +68,15 @@ export default function AnnouncementList() {
     setShowModal(true);
   };
 
-  const handleDelete = (id) => {
-    setAnnouncements(announcements.filter((announcement) => announcement.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      await fetch(`http://localhost:5000/api/announcements/${id}`, {
+        method: "DELETE",
+      });
+      setAnnouncements(announcements.filter((announcement) => announcement._id !== id));
+    } catch (error) {
+      console.error("Error deleting announcement:", error);
+    }
   };
 
   return (
@@ -68,13 +108,21 @@ export default function AnnouncementList() {
               >
                 ✖
               </button>
-              <AddAnnouncementForm
-                editMode={editMode}
-                selectedAnnouncement={selectedAnnouncement}
-                onClose={() => setShowModal(false)}
-                setAnnouncements={setAnnouncements}
-                announcements={announcements}
-              />
+              {editMode ? (
+                <EditAnnouncementForm
+                  selectedAnnouncement={selectedAnnouncement}
+                  onClose={() => setShowModal(false)}
+                  setAnnouncements={setAnnouncements}
+                  announcements={announcements}
+                />
+              ) : (
+                <AddAnnouncementForm
+                  onClose={() => setShowModal(false)}
+                  setAnnouncements={setAnnouncements}
+                  announcements={announcements}
+                  loggedInAdminId={loggedInAdminId} // Pass logged-in admin ID
+                />
+              )}
             </div>
           </div>
         )}
@@ -87,27 +135,17 @@ export default function AnnouncementList() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Author</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created At</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {announcements.map((announcement) => (
-                <tr key={announcement.id} className="hover:bg-gray-50 transition">
-                  <td className="px-6 py-4">{announcement.id}</td>
+                <tr key={announcement._id} className="hover:bg-gray-50 transition">
+                  <td className="px-6 py-4">{announcement._id}</td> {/* Display MongoDB ID */}
                   <td className="px-6 py-4">{announcement.title}</td>
-                  <td className="px-6 py-4">{announcement.author}</td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        announcement.status === "Active"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {announcement.status}
-                    </span>
-                  </td>
+                  <td className="px-6 py-4">{getUsernameById(announcement.createdBy)}</td> {/* Display Author Name */}
+                  <td className="px-6 py-4">{new Date(announcement.createdAt).toLocaleString()}</td> {/* Created At */}
                   <td className="px-6 py-4 text-right flex gap-2 justify-end">
                     <button
                       className="text-blue-600 hover:underline flex items-center"
@@ -117,7 +155,7 @@ export default function AnnouncementList() {
                     </button>
                     <button
                       className="text-red-600 hover:underline"
-                      onClick={() => handleDelete(announcement.id)}
+                      onClick={() => handleDelete(announcement._id)} // Use _id here
                     >
                       🗑️ Delete
                     </button>
@@ -131,3 +169,8 @@ export default function AnnouncementList() {
     </div>
   );
 }
+
+AnnouncementList.propTypes = {
+  announcements: PropTypes.array.isRequired,
+  setAnnouncements: PropTypes.func.isRequired,
+};

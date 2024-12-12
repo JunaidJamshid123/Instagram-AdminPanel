@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function UserTable({ users, segments, updateUserSegment, removeUserFromSegment }) {
+export default function UserTable({ users, segments, updateUserSegment }) {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <h3 className="text-lg font-semibold mb-4">User List</h3>
@@ -16,18 +16,18 @@ export default function UserTable({ users, segments, updateUserSegment, removeUs
         </thead>
         <tbody>
           {users.map((user) => (
-            <tr key={user.id} className="hover:bg-gray-50">
-              <td className="border-b py-2">{user.id}</td>
+            <tr key={user._id} className="hover:bg-gray-50">
+              <td className="border-b py-2">{user._id}</td>
               <td className="border-b py-2">{user.username}</td>
               <td className="border-b py-2">{user.email}</td>
               <td className="border-b py-2">
                 <select
                   value={user.segment}
-                  onChange={(e) => updateUserSegment(user.id, e.target.value)}
+                  onChange={(e) => updateUserSegment(user._id, e.target.value)}
                   className="p-2 border rounded"
                 >
                   {segments.map((segment) => (
-                    <option key={segment.id} value={segment.name}>
+                    <option key={segment._id} value={segment._id}>
                       {segment.name}
                     </option>
                   ))}
@@ -35,10 +35,10 @@ export default function UserTable({ users, segments, updateUserSegment, removeUs
               </td>
               <td className="border-b py-2">
                 <button
-                  className="bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700"
-                  onClick={() => removeUserFromSegment(user.id)}
+                  className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
+                  onClick={() => updateUserSegment(user._id, user.segment)}
                 >
-                  Remove
+                  Update
                 </button>
               </td>
             </tr>

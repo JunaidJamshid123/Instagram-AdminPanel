@@ -1,53 +1,53 @@
 import { useState } from "react";
+import axios from "axios";
 
 export default function AddAnnouncementForm({
-  editMode,
-  selectedAnnouncement,
   onClose,
   setAnnouncements,
   announcements,
+  loggedInAdminId, // Pass the logged-in admin ID as a prop
 }) {
   const [formData, setFormData] = useState({
-    title: selectedAnnouncement?.title || "",
-    content: selectedAnnouncement?.content || "",
-    author: selectedAnnouncement?.author || "",
-    status: selectedAnnouncement?.status || "Active",
+    title: "",
+    content: "",
+    image: "",
+    createdBy: loggedInAdminId, // Use admin ID directly
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editMode) {
-      setAnnouncements(
-        announcements.map((announcement) =>
-          announcement.id === selectedAnnouncement.id
-            ? { ...announcement, ...formData }
-            : announcement
-        )
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/announcements",
+        formData
       );
-    } else {
-      setAnnouncements([
-        ...announcements,
-        { id: `A${announcements.length + 1}`, ...formData },
-      ]);
+
+      setAnnouncements([...announcements, response.data]);
+      onClose();
+    } catch (err) {
+      setError("Error adding announcement: " + err.message);
+    } finally {
+      setLoading(false);
     }
-    onClose();
   };
 
   return (
     <div>
-      <h2 className="text-xl font-bold mb-4">
-        {editMode ? "Edit Announcement" : "Add New Announcement"}
-      </h2>
+      <h2 className="text-xl font-bold mb-4">Add New Announcement</h2>
+      {error && <div className="text-red-500 mb-4">{error}</div>}
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Title
-          </label>
+          <label className="block text-sm font-medium text-gray-700">Title</label>
           <input
             type="text"
             name="title"
@@ -58,9 +58,7 @@ export default function AddAnnouncementForm({
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Content
-          </label>
+          <label className="block text-sm font-medium text-gray-700">Content</label>
           <textarea
             name="content"
             placeholder="Enter announcement content"
@@ -70,37 +68,22 @@ export default function AddAnnouncementForm({
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Author
-          </label>
+          <label className="block text-sm font-medium text-gray-700">Image URL</label>
           <input
             type="text"
-            name="author"
-            placeholder="Enter author name"
-            value={formData.author}
+            name="image"
+            placeholder="Enter image URL"
+            value={formData.image}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Status
-          </label>
-          <select
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="Active">Active</option>
-            <option value="Scheduled">Scheduled</option>
-          </select>
-        </div>
         <button
           type="submit"
           className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition w-full"
+          disabled={loading}
         >
-          {editMode ? "Update Announcement" : "Create Announcement"}
+          {loading ? "Submitting..." : "Create Announcement"}
         </button>
       </form>
     </div>

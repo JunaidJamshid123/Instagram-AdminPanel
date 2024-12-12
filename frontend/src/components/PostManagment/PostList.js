@@ -1,31 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AddPostForm from "./add_post_form";
+import EditPostForm from "./Edit_Post_Form"; // Import the EditPostForm
 
 export default function PostList() {
-  const [posts, setPosts] = useState([
-    {
-      id: "001",
-      postId: "P001",
-      title: "Post Title 1",
-      content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      userId: "001",
-      author: "Wayne Bruce",
-      status: "Published",
-    },
-    {
-      id: "002",
-      postId: "P002",
-      title: "Post Title 2",
-      content: "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-      userId: "002",
-      author: "Ragnor Lothbrok",
-      status: "Draft",
-    },
-  ]);
-
+  const [posts, setPosts] = useState([]); // State for posts
+  const [users, setUsers] = useState([]); // State for users data
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
+
+  // Fetch posts and users from the backend API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch posts
+        const postsResponse = await fetch("http://localhost:5000/api/posts");
+        const postsData = await postsResponse.json();
+        setPosts(postsData);
+
+        // Fetch users
+        const usersResponse = await fetch("http://localhost:5000/api/users");
+        const usersData = await usersResponse.json();
+        setUsers(usersData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []); // Fetch data only once on component mount
 
   const handleEdit = (post) => {
     setEditMode(true);
@@ -39,8 +42,30 @@ export default function PostList() {
     setShowModal(true);
   };
 
-  const handleDelete = (postId) => {
-    setPosts(posts.filter((post) => post.postId !== postId));
+  const handleDelete = async (postId) => {
+    try {
+      await fetch(`http://localhost:5000/api/posts/${postId}`, {
+        method: "DELETE",
+      });
+      setPosts(posts.filter((post) => post._id !== postId));
+    } catch (error) {
+      console.error("Error deleting post:", error);
+    }
+  };
+
+  // Function to get the author's name based on userId
+  const getAuthorName = (userId) => {
+    const user = users.find((user) => user._id === userId);
+    return user ? user.username : "Unknown Author";
+  };
+
+  // Function to format the post creation date to "YYYY-MM-DD"
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   };
 
   return (
@@ -72,13 +97,21 @@ export default function PostList() {
               >
                 ✖
               </button>
-              <AddPostForm
-                editMode={editMode}
-                selectedPost={selectedPost}
-                onClose={() => setShowModal(false)}
-                setPosts={setPosts}
-                posts={posts}
-              />
+              {/* Render EditPostForm when in edit mode, otherwise AddPostForm */}
+              {editMode ? (
+                <EditPostForm
+                  selectedPost={selectedPost}
+                  onClose={() => setShowModal(false)}
+                  setPosts={setPosts}
+                  posts={posts}
+                />
+              ) : (
+                <AddPostForm
+                  onClose={() => setShowModal(false)}
+                  setPosts={setPosts}
+                  posts={posts}
+                />
+              )}
             </div>
           </div>
         )}
@@ -98,7 +131,7 @@ export default function PostList() {
                   Author
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Status
+                  Created On
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
                   Actions
@@ -107,20 +140,14 @@ export default function PostList() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {posts.map((post) => (
-                <tr key={post.postId} className="hover:bg-gray-50 transition">
-                  <td className="px-6 py-4 text-sm text-gray-900">{post.postId}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{post.title}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{post.author}</td>
-                  <td className="px-6 py-4 text-sm">
-                    <span
-                      className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        post.status === "Published"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {post.status}
-                    </span>
+                <tr key={post._id} className="hover:bg-gray-50 transition">
+                  <td className="px-6 py-4 text-sm text-gray-900">{post._id}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{post.caption}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">
+                    {getAuthorName(post.user)} {/* Displaying author's name */}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">
+                    {formatDate(post.createdAt)} {/* Displaying post creation date */}
                   </td>
                   <td className="px-6 py-4 text-right text-sm flex gap-2 justify-end">
                     <button
@@ -131,7 +158,7 @@ export default function PostList() {
                     </button>
                     <button
                       className="text-red-600 hover:underline"
-                      onClick={() => handleDelete(post.postId)}
+                      onClick={() => handleDelete(post._id)}
                     >
                       🗑️ Delete
                     </button>

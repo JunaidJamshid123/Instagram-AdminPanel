@@ -1,8 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Sidebar({ setActivePage }) {
   const navigate = useNavigate();
+  const [admin, setAdmin] = useState({ username: "", profilePicture: "" });
+
+  useEffect(() => {
+    // Fetch admin data from localStorage or session
+    const adminData = localStorage.getItem("user");
+    if (adminData) {
+      const parsedAdmin = JSON.parse(adminData);
+      setAdmin({
+        username: parsedAdmin.username || "Admin", // Fallback to "Admin" if username is not available
+        profilePicture: parsedAdmin.profilePicture || "https://via.placeholder.com/150", // Default profile picture
+      });
+    }
+  }, []);
 
   // Logout functionality
   const handleLogout = () => {
@@ -15,10 +28,14 @@ function Sidebar({ setActivePage }) {
     <div className="h-screen w-60 bg-white text-black flex flex-col justify-between fixed border-r border-gray-300">
       {/* Profile Section */}
       <div className="flex flex-col items-center py-6">
-        <div className="bg-gray-200 w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold text-purple-600">
-          AB
-        </div>
-        <h2 className="mt-2 text-lg font-semibold text-gray-700">Andrew Bennet</h2>
+        <img
+          src={admin.profilePicture}
+          alt="Admin Profile"
+          className="w-16 h-16 rounded-full object-cover"
+        />
+        <h2 className="mt-2 text-lg font-semibold text-gray-700">
+          {admin.username}
+        </h2>
       </div>
 
       {/* Navigation Links */}

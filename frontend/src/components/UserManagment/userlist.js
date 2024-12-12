@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import AddUserForm from "./add_user_form";
 import UserDataForm from "./UserDataForm";
+import EditUserForm from "./EditUser"; // Import the EditUser form
 
 export default function UserList() {
   const [users, setUsers] = useState([]);
@@ -109,11 +110,16 @@ export default function UserList() {
               >
                 ✖
               </button>
-              <AddUserForm
-                editMode={editMode}
-                selectedUser={selectedUser}
-                onClose={() => setShowModal(false)}
-              />
+              {editMode ? (
+                <EditUserForm
+                  selectedUser={selectedUser}
+                  onClose={() => setShowModal(false)}
+                />
+              ) : (
+                <AddUserForm
+                  onClose={() => setShowModal(false)}
+                />
+              )}
             </div>
           </div>
         )}
@@ -139,21 +145,6 @@ export default function UserList() {
                   Confirm
                 </button>
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* User Data Form Modal */}
-        {viewUser && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white w-full max-w-2xl rounded-lg shadow-lg p-6 relative">
-              <button
-                className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
-                onClick={() => setViewUser(null)}
-              >
-                ✖
-              </button>
-              <UserDataForm user={viewUser} onClose={() => setViewUser(null)} />
             </div>
           </div>
         )}
@@ -236,4 +227,3 @@ export default function UserList() {
     </div>
   );
 }
-

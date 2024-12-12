@@ -1,23 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-export default function SegmentForm({ addSegment, closeModal }) {
+export default function SegmentForm({ addSegment, closeModal, loggedInAdmin }) {
   const [name, setName] = useState("");
-  const [users, setUsers] = useState(0);
   const [description, setDescription] = useState("");
-  const [criteria, setCriteria] = useState("");
 
-  const handleSubmit = (e) => {
+  // Handle form submission
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name || users <= 0) return;
+    if (!name || !description) return;
+
     const newSegment = {
-      id: Date.now(),
       name,
-      users: parseInt(users),
       description,
-      criteria,
+      createdBy: loggedInAdmin, // Use the logged-in admin's ID
     };
-    addSegment(newSegment);
-    closeModal();
+
+    try {
+      // Sending the segment to the backend
+      const response = await fetch("http://localhost:5000/api/user-segments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newSegment),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create a new segment");
+      }
+
+      const savedSegment = await response.json();
+      addSegment(savedSegment);
+      closeModal();
+    } catch (error) {
+      console.error("Error adding segment:", error);
+    }
   };
 
   return (
@@ -36,31 +53,12 @@ export default function SegmentForm({ addSegment, closeModal }) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium">Number of Users</label>
-            <input
-              type="number"
-              value={users}
-              onChange={(e) => setUsers(e.target.value)}
-              className="w-full p-2 border rounded"
-              placeholder="Enter number of users"
-            />
-          </div>
-          <div>
             <label className="block text-sm font-medium">Description</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="w-full p-2 border rounded"
               placeholder="Enter segment description"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Criteria</label>
-            <textarea
-              value={criteria}
-              onChange={(e) => setCriteria(e.target.value)}
-              className="w-full p-2 border rounded"
-              placeholder="Enter criteria for the segment"
             />
           </div>
           <div className="flex justify-between">
